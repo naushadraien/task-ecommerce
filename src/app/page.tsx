@@ -1,4 +1,8 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { toast } from "sonner";
 
 export default function Home() {
   return (
@@ -12,6 +16,23 @@ export default function Home() {
           height={38}
           priority
         />
+        <Button
+          onClick={() =>
+            toast("Event has been created", {
+              description: "Sunday, December 03, 2023 at 9:00 AM",
+              action: {
+                label: "Undo",
+                onClick: () => console.log("Undo"),
+              },
+              position: "top-center",
+              style: {
+                backgroundColor: "red",
+              },
+            })
+          }
+        >
+          Press Me
+        </Button>
         <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2 tracking-[-.01em]">
             Get started by editing{" "}
