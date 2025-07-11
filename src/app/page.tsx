@@ -1,8 +1,9 @@
 "use client";
 
+import Modal from "@/components/Modal";
 import { Button } from "@/components/ui/button";
+import { showToast } from "@/utils/show-toast";
 import Image from "next/image";
-import { toast } from "sonner";
 
 export default function Home() {
   return (
@@ -18,21 +19,31 @@ export default function Home() {
         />
         <Button
           onClick={() =>
-            toast("Event has been created", {
-              description: "Sunday, December 03, 2023 at 9:00 AM",
-              action: {
-                label: "Undo",
-                onClick: () => console.log("Undo"),
+            showToast(
+              "Event has been created",
+              {
+                description: "Sunday, December 03, 2023 at 9:00 AM",
+                action: {
+                  label: "Undo",
+                  onClick: () => console.log("Undo"),
+                },
               },
-              position: "top-center",
-              style: {
-                backgroundColor: "red",
-              },
-            })
+              "success"
+            )
           }
         >
           Press Me
         </Button>
+
+        <Modal
+          trigger={<Button>Click Me</Button>}
+          title="Confirm this"
+          description="I am testing"
+          isLoading
+        >
+          <div>Hello</div>
+        </Modal>
+
         <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2 tracking-[-.01em]">
             Get started by editing{" "}
