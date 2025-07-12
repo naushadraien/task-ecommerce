@@ -18,10 +18,10 @@ export function showToast(
   const styleWithVariant = styleMap[variant];
 
   return toast(message, {
-    ...data,
     style: {
       ...data?.style,
       ...styleWithVariant,
     },
+    ...data,
   });
 }

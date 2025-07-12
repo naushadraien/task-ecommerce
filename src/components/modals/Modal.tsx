@@ -24,6 +24,7 @@ interface ModalProps {
   onOpenChange?: (open: boolean) => void;
   className?: string;
   showCloseButton?: boolean;
+  showConfirmButton?: boolean;
   closeButtonText?: string;
   confirmBtnText?: string;
   confirmBtnClassName?: string;
@@ -53,6 +54,7 @@ export default function Modal({
   isLoading = false,
   onConfirm,
   confirmBtnVariant,
+  showConfirmButton = true,
 }: ModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -73,15 +75,17 @@ export default function Modal({
               <Button variant="outline">{closeButtonText}</Button>
             </DialogClose>
           )}
-          <Button
-            className={confirmBtnClassName}
-            disabled={isLoading}
-            onClick={onConfirm}
-            variant={confirmBtnVariant}
-          >
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {confirmBtnText}
-          </Button>
+          {showConfirmButton && (
+            <Button
+              className={confirmBtnClassName}
+              disabled={isLoading}
+              onClick={onConfirm}
+              variant={confirmBtnVariant}
+            >
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {confirmBtnText}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
