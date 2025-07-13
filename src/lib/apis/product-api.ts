@@ -67,12 +67,13 @@ type AddCategoryPayload = {
 
 type ProductApiConfig = {
   getProducts: (params?: Pagination) => ApiRequestConfig<void>;
+  getSingleProduct: (productId: string) => ApiRequestConfig<void>;
   getAllCategories: (params?: Pagination) => ApiRequestConfig<void>;
   createProductCategory: (
     data: AddCategoryPayload
   ) => ApiRequestConfig<AddCategoryPayload>;
   addProduct: (data: FormData) => ApiRequestConfig<FormData>;
-  deleteProduct: (productId: string) => ApiRequestConfig;
+  deleteProduct: (productId: string) => ApiRequestConfig<void>;
 };
 
 export const productApi: ProductApiConfig = {
@@ -81,6 +82,12 @@ export const productApi: ProductApiConfig = {
       url: "/ecommerce/products",
       method: "get",
       params,
+    };
+  },
+  getSingleProduct: (productId) => {
+    return {
+      url: `/ecommerce/products/${productId}`,
+      method: "get",
     };
   },
   getAllCategories: (params) => {

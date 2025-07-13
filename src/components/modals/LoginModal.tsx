@@ -133,21 +133,7 @@ export default function LoginModal({
             "Login"
           )}
         </Button>
-        <div className="mt-4 p-4 bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
-          <h4 className="font-semibold mb-2 text-center text-sm">
-            Demo Credentials:
-          </h4>
-          <div className="text-xs space-y-1">
-            <p className="flex justify-between">
-              <strong>Admin:</strong>
-              <span className="text-blue-600">admin@demo.com / admin123</span>
-            </p>
-            <p className="flex justify-between">
-              <strong>User:</strong>
-              <span className="text-purple-600">user@demo.com / user123</span>
-            </p>
-          </div>
-        </div>
+
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Don&apos;t have an account?

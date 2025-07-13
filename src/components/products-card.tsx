@@ -1,18 +1,17 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { ShoppingCart, Heart, Star, Eye } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { GetCategoryResponse } from "@/lib/apis/product-api";
-// import type { Product } from "@/lib/types";
-// import { useCartStore } from "@/store/cart-store";
-// import { useToast } from "@/components/toast-provider";
+import { GetCategoryResponse, Product } from "@/lib/apis/product-api";
+import { useCartStore } from "@/store/cart-store";
+import { showToast } from "@/utils/show-toast";
+import { Eye, Heart, ShoppingCart, Star } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 interface ProductCardProps {
-  product: any;
+  product: Product;
   viewMode?: "grid" | "list";
   productCategories?: GetCategoryResponse["categories"];
 }
@@ -22,12 +21,11 @@ export function ProductCard({
   viewMode = "grid",
   productCategories,
 }: ProductCardProps) {
-  // const { addItem } = useCartStore();
-  // const { showToast } = useToast();
+  const { addItem } = useCartStore();
 
   const handleAddToCart = () => {
-    // addItem(product);
-    // showToast(`🛒 ${product.name} added to cart!`, "success");
+    addItem(product);
+    showToast(`🛒 ${product.name} added to cart!`, undefined, "success");
   };
 
   const getProductCategoryName = (categoryId: string) => {
