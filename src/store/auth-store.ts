@@ -1,5 +1,11 @@
-import { AUTH_STORAGE } from "@/constants/local-storage";
-import { UserType } from "@/lib/apis/auth";
+import {
+  ACCESS_TOKEN,
+  AUTH_STORAGE,
+  REFRESH_TOKEN,
+} from "@/constants/local-storage";
+import { UserType } from "@/lib/apis/auth-api";
+import { clearAxiosConfig } from "@/utils/axios/axios-instance";
+import { removeItemFromLocalStorage } from "@/utils/local-storage";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -35,6 +41,9 @@ export const useAuthStore = create<State & Action>()(
           token: null,
           isAuthenticated: false,
         });
+        removeItemFromLocalStorage(ACCESS_TOKEN);
+        removeItemFromLocalStorage(REFRESH_TOKEN);
+        clearAxiosConfig();
       },
     }),
     {

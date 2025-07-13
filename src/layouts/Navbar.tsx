@@ -124,10 +124,12 @@ export function Navbar() {
       <LoginModal
         isOpen={authMode === "login"}
         onClose={handleAuthModalClose}
+        onRegisterClick={() => openAuthModal("register")}
       />
       <RegisterModal
         isOpen={authMode === "register"}
         onClose={handleAuthModalClose}
+        onLoginClick={() => openAuthModal("login")}
       />
       <LogoutModal
         isOpen={authMode === "logout"}

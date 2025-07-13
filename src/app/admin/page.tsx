@@ -1,5 +1,10 @@
+import { ProtectedRoute } from "@/components/protected-route";
 import AdminPageContent from "@/page-sections/AdminPageContent";
 
 export default function AdminPage() {
-  return <AdminPageContent />;
+  return (
+    <ProtectedRoute adminOnly>
+      <AdminPageContent />
+    </ProtectedRoute>
+  );
 }

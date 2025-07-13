@@ -2,7 +2,7 @@ import {
   authApi,
   LoginRequestPayload,
   LoginResponsePayload,
-} from "@/lib/apis/auth";
+} from "@/lib/apis/auth-api";
 import requestAPI from "@/utils/request-api";
 import { showToast } from "@/utils/show-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,10 +14,13 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import Modal from "./Modal";
 import { useAuthStore } from "@/store/auth-store";
+import { setItemToLocalStorage } from "@/utils/local-storage";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/constants/local-storage";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
+  onRegisterClick?: VoidFunction;
 };
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -27,7 +30,11 @@ const loginSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-export default function LoginModal({ isOpen, onClose }: Props) {
+export default function LoginModal({
+  isOpen,
+  onClose,
+  onRegisterClick,
+}: Props) {
   const { setAuth } = useAuthStore();
 
   const loginForm = useForm<LoginForm>({
@@ -45,6 +52,8 @@ export default function LoginModal({ isOpen, onClose }: Props) {
       return await requestAPI(authApi.loginUser(data));
     },
     onSuccess(data) {
+      setItemToLocalStorage<string>(ACCESS_TOKEN, data.accessToken);
+      setItemToLocalStorage<string>(REFRESH_TOKEN, data.refreshToken);
       setAuth({
         isAuthenticated: !!data.accessToken,
         token: data.accessToken,
@@ -144,7 +153,7 @@ export default function LoginModal({ isOpen, onClose }: Props) {
             Don&apos;t have an account?
             <button
               type="button"
-              onClick={() => {}}
+              onClick={onRegisterClick}
               className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
               disabled={isLoggingIn}
             >

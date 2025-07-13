@@ -1,4 +1,4 @@
-import { authApi, RegisterRequestPayload } from "@/lib/apis/auth";
+import { authApi, RegisterRequestPayload } from "@/lib/apis/auth-api";
 import requestAPI from "@/utils/request-api";
 import { showToast } from "@/utils/show-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,6 +29,7 @@ export type RegisterForm = z.infer<typeof registerSchema>;
 type Props = {
   isOpen: boolean;
   onClose: () => void;
+  onLoginClick?: VoidFunction;
 };
 
 const registerSchema = z
@@ -44,7 +45,11 @@ const registerSchema = z
     path: ["confirmPassword"],
   });
 
-export default function RegisterModal({ isOpen, onClose }: Props) {
+export default function RegisterModal({
+  isOpen,
+  onClose,
+  onLoginClick,
+}: Props) {
   const registerForm = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -62,9 +67,9 @@ export default function RegisterModal({ isOpen, onClose }: Props) {
     },
     onSuccess() {
       showToast(
-        "SUCCESS",
+        "Registered successfully.",
         {
-          description: "User Registered successfully",
+          description: "Now you can login.",
         },
         "success"
       );
@@ -93,7 +98,7 @@ export default function RegisterModal({ isOpen, onClose }: Props) {
       isLoading={isRegisteringUser}
       showCloseButton={false}
       showConfirmButton={false}
-      className="max-h-[90vh] overflow-y-auto scrollbar-hidden self-center"
+      className="max-h-[90vh] overflow-y-auto scrollbar-hidden"
     >
       <Form {...registerForm}>
         <form
@@ -221,7 +226,7 @@ export default function RegisterModal({ isOpen, onClose }: Props) {
               Already have an account?
               <button
                 type="button"
-                onClick={() => {}}
+                onClick={onLoginClick}
                 className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
                 disabled={isRegisteringUser}
               >

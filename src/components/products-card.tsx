@@ -6,6 +6,7 @@ import { ShoppingCart, Heart, Star, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { GetCategoryResponse } from "@/lib/apis/product-api";
 // import type { Product } from "@/lib/types";
 // import { useCartStore } from "@/store/cart-store";
 // import { useToast } from "@/components/toast-provider";
@@ -13,15 +14,27 @@ import { Badge } from "@/components/ui/badge";
 interface ProductCardProps {
   product: any;
   viewMode?: "grid" | "list";
+  productCategories?: GetCategoryResponse["categories"];
 }
 
-export function ProductCard({ product, viewMode = "grid" }: ProductCardProps) {
+export function ProductCard({
+  product,
+  viewMode = "grid",
+  productCategories,
+}: ProductCardProps) {
   // const { addItem } = useCartStore();
   // const { showToast } = useToast();
 
   const handleAddToCart = () => {
     // addItem(product);
     // showToast(`🛒 ${product.name} added to cart!`, "success");
+  };
+
+  const getProductCategoryName = (categoryId: string) => {
+    const foundCategory = productCategories?.find(
+      (item) => item._id === categoryId
+    );
+    return foundCategory ? foundCategory.name : "N/A";
   };
 
   if (viewMode === "list") {
@@ -38,7 +51,7 @@ export function ProductCard({ product, viewMode = "grid" }: ProductCardProps) {
               />
               <div className="absolute top-4 left-4">
                 <Badge className="bg-linear-to-r from-blue-500 to-purple-500 text-white border-0">
-                  {product.category}
+                  {getProductCategoryName(product.category)}
                 </Badge>
               </div>
             </div>
@@ -133,17 +146,17 @@ export function ProductCard({ product, viewMode = "grid" }: ProductCardProps) {
           <Button
             size="icon"
             variant="secondary"
-            className="rounded-full shadow-lg backdrop-blur-xs bg-white/90"
+            className="rounded-full shadow-lg backdrop-blur-xs bg-white/90 dark:bg-gray-800/90 border dark:border-gray-700"
           >
-            <Heart className="h-4 w-4" />
+            <Heart className="h-4 w-4 text-gray-700 dark:text-gray-200" />
           </Button>
           <Link href={`/products/${product._id}`}>
             <Button
               size="icon"
               variant="secondary"
-              className="rounded-full shadow-lg backdrop-blur-xs bg-white/90"
+              className="rounded-full shadow-lg backdrop-blur-xs bg-white/90 dark:bg-gray-800/90 border dark:border-gray-700"
             >
-              <Eye className="h-4 w-4" />
+              <Eye className="h-4 w-4 text-gray-700 dark:text-gray-200" />
             </Button>
           </Link>
         </div>
@@ -151,7 +164,7 @@ export function ProductCard({ product, viewMode = "grid" }: ProductCardProps) {
         {/* Category Badge */}
         <div className="absolute top-4 left-4">
           <Badge className="bg-linear-to-r from-blue-500 to-purple-500 text-white border-0 shadow-lg">
-            {product.category}
+            {getProductCategoryName(product.category)}
           </Badge>
         </div>
 

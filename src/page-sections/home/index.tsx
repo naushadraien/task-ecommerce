@@ -1,27 +1,66 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
+import { Skeleton } from "@/components/Skeleton";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
-  ShoppingBag,
-  Shield,
-  Truck,
-  Star,
+  GetCategoryResponse,
+  GetProductResponse,
+  productApi,
+} from "@/lib/apis/product-api";
+import requestAPI from "@/utils/request-api";
+import { useQuery } from "@tanstack/react-query";
+import {
   ArrowRight,
-  Zap,
-  Heart,
-  Gift,
-  Users,
   Award,
   Clock,
+  Gift,
+  Heart,
+  Shield,
+  ShoppingBag,
+  Star,
+  Truck,
+  Users,
+  Zap,
 } from "lucide-react";
-import { dummyProducts } from "@/utils/dummy-data";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function HomePage() {
-  const featuredProducts = dummyProducts.slice(0, 4);
+  const { data: products, isLoading: isProductdataLoading } =
+    useQuery<GetProductResponse>({
+      queryKey: ["products"],
+      queryFn: async () => {
+        return await requestAPI(
+          productApi.getProducts({
+            page: 1,
+            limit: 10,
+          })
+        );
+      },
+    });
+
+  const { data: allProductCategory } = useQuery<GetCategoryResponse>({
+    queryKey: ["product-category"],
+    queryFn: async () => {
+      return await requestAPI(
+        productApi.getAllCategories({
+          limit: 10,
+          page: 1,
+        })
+      );
+    },
+  });
+
+  const getProductCategoryName = (categoryId: string) => {
+    const foundCategory = allProductCategory?.categories.find(
+      (item) => item._id === categoryId
+    );
+    return foundCategory ? foundCategory.name : "N/A";
+  };
+
+  const featuredProducts = products?.products.slice(0, 4) ?? [];
 
   return (
     <div className="overflow-hidden">
@@ -107,39 +146,58 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-linear-to-r from-blue-400 to-purple-500 rounded-3xl blur-3xl opacity-20 animate-pulse"></div>
                 <div className="relative bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xs">
                   <div className="grid grid-cols-2 gap-6">
-                    {featuredProducts.slice(0, 4).map((product) => (
-                      <div
-                        key={product._id}
-                        className="bg-linear-to-br from-gray-50 to-white dark:from-gray-700 dark:to-gray-600 rounded-2xl p-4 hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-                      >
-                        <div className="aspect-square mb-3 rounded-xl overflow-hidden">
-                          <Image
-                            src={
-                              product.mainImage?.url ||
-                              "/placeholder.svg?height=120&width=120"
-                            }
-                            alt={product.name}
-                            width={120}
-                            height={120}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <h4 className="font-semibold text-sm line-clamp-1 mb-1">
-                          {product.name}
-                        </h4>
-                        <p className="text-blue-600 font-bold text-lg">
-                          ${product.price}
-                        </p>
-                        <div className="flex items-center mt-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                              key={star}
-                              className="w-3 h-3 fill-yellow-400 text-yellow-400"
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    ))}
+                    {isProductdataLoading
+                      ? [1, 2, 3, 4].map((i) => (
+                          <div
+                            key={i}
+                            className="bg-linear-to-br from-gray-50 to-white dark:from-gray-700 dark:to-gray-600 rounded-2xl p-4"
+                          >
+                            <Skeleton className="aspect-square mb-3 rounded-xl" />
+                            <Skeleton className="h-4 mb-2" />
+                            <Skeleton className="h-6 w-1/2 mb-1" />
+                            <div className="flex items-center mt-1 gap-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Skeleton
+                                  key={star}
+                                  className="w-3 h-3 rounded-full"
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        ))
+                      : featuredProducts.map((product) => (
+                          <div
+                            key={product._id}
+                            className="bg-linear-to-br from-gray-50 to-white dark:from-gray-700 dark:to-gray-600 rounded-2xl p-4 hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                          >
+                            <div className="aspect-square mb-3 rounded-xl overflow-hidden">
+                              <Image
+                                src={
+                                  product.mainImage?.url ||
+                                  "/placeholder.svg?height=120&width=120"
+                                }
+                                alt={product.name}
+                                width={120}
+                                height={120}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <h4 className="font-semibold text-sm line-clamp-1 mb-1">
+                              {product.name}
+                            </h4>
+                            <p className="text-blue-600 font-bold text-lg">
+                              ${product.price}
+                            </p>
+                            <div className="flex items-center mt-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className="w-3 h-3 fill-yellow-400 text-yellow-400"
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        ))}
                   </div>
                 </div>
               </div>
@@ -224,74 +282,90 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredProducts.map((product) => (
-              <Card
-                key={product._id}
-                className="overflow-hidden hover:shadow-2xl transition-all duration-500 group bg-white dark:bg-gray-700 border-0 hover:-translate-y-2"
-              >
-                <div className="aspect-square overflow-hidden relative">
-                  <Image
-                    src={
-                      product.mainImage?.url ||
-                      "/placeholder.svg?height=300&width=300"
-                    }
-                    alt={product.name}
-                    width={300}
-                    height={300}
-                    className="h-full w-full object-cover transition-transform group-hover:scale-110 duration-500"
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <Badge className="bg-red-500 text-white shadow-lg">
-                      Hot
-                    </Badge>
-                  </div>
-                  <div className="absolute top-4 left-4">
-                    <Badge className="bg-white/90 text-gray-800 shadow-lg">
-                      {product.category}
-                    </Badge>
-                  </div>
-                </div>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-1 mb-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className="w-4 h-4 fill-yellow-400 text-yellow-400"
-                      />
-                    ))}
-                    <span className="text-sm text-gray-600 dark:text-gray-400 ml-1">
-                      (4.8)
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-lg mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors">
-                    {product.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
-                    {product.description}
-                  </p>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold text-blue-600">
-                        ${product.price}
-                      </span>
-                      <span className="text-sm text-gray-500 line-through">
-                        ${(product.price * 1.2).toFixed(2)}
-                      </span>
+            {isProductdataLoading
+              ? [1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="bg-linear-to-br from-gray-50 to-white dark:from-gray-700 dark:to-gray-600 rounded-2xl p-4"
+                  >
+                    <Skeleton className="aspect-square mb-3 rounded-xl" />
+                    <Skeleton className="h-4 mb-2" />
+                    <Skeleton className="h-6 w-1/2 mb-1" />
+                    <div className="flex items-center mt-1 gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Skeleton key={star} className="w-3 h-3 rounded-full" />
+                      ))}
                     </div>
-                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                      20% OFF
-                    </Badge>
                   </div>
-                  <Link href={`/products/${product._id}`}>
-                    <Button className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
-                      View Details
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
+                ))
+              : featuredProducts.map((product) => (
+                  <Card
+                    key={product._id}
+                    className="overflow-hidden hover:shadow-2xl transition-all duration-500 group bg-white dark:bg-gray-700 border-0 hover:-translate-y-2"
+                  >
+                    <div className="aspect-square overflow-hidden relative">
+                      <Image
+                        src={
+                          product.mainImage?.url ||
+                          "/placeholder.svg?height=300&width=300"
+                        }
+                        alt={product.name}
+                        width={300}
+                        height={300}
+                        className="h-full w-full object-cover transition-transform group-hover:scale-110 duration-500"
+                      />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <Badge className="bg-red-500 text-white shadow-lg">
+                          Hot
+                        </Badge>
+                      </div>
+                      <div className="absolute top-4 left-4">
+                        <Badge className="bg-white/90 text-gray-800 shadow-lg">
+                          {getProductCategoryName(product.category)}
+                        </Badge>
+                      </div>
+                    </div>
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-1 mb-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                          />
+                        ))}
+                        <span className="text-sm text-gray-600 dark:text-gray-400 ml-1">
+                          (4.8)
+                        </span>
+                      </div>
+                      <h3 className="font-bold text-lg mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                        {product.name}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+                        {product.description}
+                      </p>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl font-bold text-blue-600">
+                            ${product.price}
+                          </span>
+                          <span className="text-sm text-gray-500 line-through">
+                            ${(product.price * 1.2).toFixed(2)}
+                          </span>
+                        </div>
+                        <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                          20% OFF
+                        </Badge>
+                      </div>
+                      <Link href={`/products/${product._id}`}>
+                        <Button className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+                          View Details
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                ))}
           </div>
 
           <div className="text-center mt-12">

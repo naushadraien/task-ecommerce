@@ -2,6 +2,7 @@ import { useAuthStore } from "@/store/auth-store";
 import { AxiosError } from "axios";
 import { removeItemFromLocalStorage } from "../local-storage";
 import { clearAxiosConfig } from "./axios-instance";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/constants/local-storage";
 
 export interface ErrorHandlerConfig {
   showToast?: boolean;
@@ -14,8 +15,8 @@ export interface ErrorHandlerConfig {
 // Handle authentication-related errors
 export const handleAuthenticationError = (): void => {
   // Clean up tokens
-  removeItemFromLocalStorage("accessToken");
-  removeItemFromLocalStorage("refreshToken");
+  removeItemFromLocalStorage(ACCESS_TOKEN);
+  removeItemFromLocalStorage(REFRESH_TOKEN);
 
   // Clear auth store
   useAuthStore.getState().logOut();
@@ -25,7 +26,7 @@ export const handleAuthenticationError = (): void => {
 
   // Redirect to login page
   if (typeof window !== "undefined") {
-    window.location.href = "/login";
+    window.location.href = "/";
   }
 };
 

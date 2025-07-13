@@ -15,6 +15,7 @@ import {
   handleAuthenticationError,
   shouldRefreshToken,
 } from "./axios-error-handler";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/constants/local-storage";
 
 // Extend AxiosResponse to include the 'ok' property
 declare module "axios" {
@@ -85,9 +86,9 @@ export const refreshToken = async ({
     const { accessToken, refreshToken: newRefreshToken } = response.data;
 
     // Update tokens in localStorage
-    setItemToLocalStorage<string>("accessToken", accessToken);
+    setItemToLocalStorage<string>(ACCESS_TOKEN, accessToken);
     if (newRefreshToken) {
-      setItemToLocalStorage<string>("refreshToken", newRefreshToken);
+      setItemToLocalStorage<string>(REFRESH_TOKEN, newRefreshToken);
     }
 
     // Update auth store
@@ -132,7 +133,7 @@ axiosInstance.interceptors.request.use(
   ): Promise<InternalAxiosRequestConfig> => {
     try {
       // Get token from localStorage
-      const token = getItemFromLocalStorage("accessToken");
+      const token = getItemFromLocalStorage(ACCESS_TOKEN);
 
       if (token) {
         config.headers["Authorization"] = `Bearer ${token}`;
@@ -192,7 +193,7 @@ export const setAxiosInstanceBaseURL = (baseURL: string): void => {
 
 // Initialize axios with stored token
 export const initializeAxios = (): void => {
-  const token = getItemFromLocalStorage<string>("accessToken");
+  const token = getItemFromLocalStorage<string>(ACCESS_TOKEN);
   if (token) {
     setAuthorizationHeader(token);
   }
