@@ -1,10 +1,24 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import Modal from "./Modal";
 import { Button } from "../ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { Input } from "../ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import Modal from "./Modal";
 
 type Props = {
   isOpen: boolean;
@@ -18,7 +32,8 @@ type RegisterForm = z.infer<typeof registerSchema>;
 const registerSchema = z
   .object({
     username: z.string().min(3, "Username must be at least 3 characters"),
-    email: z.string().email("Invalid email address"),
+    role: z.enum(["USER", "ADMIN"]),
+    email: z.email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string(),
   })
@@ -35,6 +50,13 @@ export default function RegisterModal({
 }: Props) {
   const registerForm = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      role: "USER",
+      username: "",
+      confirmPassword: "",
+      email: "",
+      password: "",
+    },
   });
 
   return (
@@ -46,98 +68,144 @@ export default function RegisterModal({
       isLoading={isLoading}
       showCloseButton={false}
       showConfirmButton={false}
+      className="max-h-[90vh] overflow-y-auto scrollbar-hide self-center"
     >
-      <form
-        className="space-y-4"
-        onSubmit={registerForm.handleSubmit(onRegister)}
-      >
-        <div className="space-y-2">
-          <Label htmlFor="username">Username</Label>
-          <Input
-            id="username"
-            {...registerForm.register("username")}
-            placeholder="Enter your username"
-            disabled={isLoading}
-          />
-          {registerForm.formState.errors.username && (
-            <p className="text-sm text-red-600">
-              {registerForm.formState.errors.username.message}
-            </p>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="register-email">Email</Label>
-          <Input
-            id="register-email"
-            type="email"
-            {...registerForm.register("email")}
-            placeholder="Enter your email"
-            disabled={isLoading}
-          />
-          {registerForm.formState.errors.email && (
-            <p className="text-sm text-red-600">
-              {registerForm.formState.errors.email.message}
-            </p>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="register-password">Password</Label>
-          <Input
-            id="register-password"
-            type="password"
-            {...registerForm.register("password")}
-            placeholder="Enter your password"
-            disabled={isLoading}
-          />
-          {registerForm.formState.errors.password && (
-            <p className="text-sm text-red-600">
-              {registerForm.formState.errors.password.message}
-            </p>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
-          <Input
-            id="confirmPassword"
-            type="password"
-            {...registerForm.register("confirmPassword")}
-            placeholder="Confirm your password"
-            disabled={isLoading}
-          />
-          {registerForm.formState.errors.confirmPassword && (
-            <p className="text-sm text-red-600">
-              {registerForm.formState.errors.confirmPassword.message}
-            </p>
-          )}
-        </div>
-        <Button
-          type="submit"
-          className="w-full bg-linear-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
-          disabled={isLoading}
+      <Form {...registerForm}>
+        <form
+          className="space-y-4"
+          onSubmit={registerForm.handleSubmit(onRegister)}
         >
-          {isLoading ? (
-            <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              Creating account...
-            </div>
-          ) : (
-            "Create Account"
-          )}
-        </Button>
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Already have an account?
-            <button
-              type="button"
-              onClick={() => {}}
-              className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
-              disabled={isLoading}
-            >
-              Login here
-            </button>
-          </p>
-        </div>
-      </form>
+          <FormField
+            control={registerForm.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input
+                    id="register-username"
+                    {...field}
+                    placeholder="Enter your username"
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={registerForm.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel>Role</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl className="w-full">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your role" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="USER">User</SelectItem>
+                    <SelectItem value="ADMIN">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={registerForm.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    id="register-email"
+                    type="email"
+                    {...field}
+                    placeholder="Enter your email"
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={registerForm.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input
+                    id="register-password"
+                    type="password"
+                    {...field}
+                    placeholder="Enter your password"
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={registerForm.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel>Confirm Password</FormLabel>
+                <FormControl>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    {...field}
+                    placeholder="Confirm your password"
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button
+            type="submit"
+            className="w-full bg-linear-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Creating account...
+              </div>
+            ) : (
+              "Create Account"
+            )}
+          </Button>
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Already have an account?
+              <button
+                type="button"
+                onClick={() => {}}
+                className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
+                disabled={isLoading}
+              >
+                Login here
+              </button>
+            </p>
+          </div>
+        </form>
+      </Form>
     </Modal>
   );
 }
