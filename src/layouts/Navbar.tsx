@@ -19,6 +19,9 @@ import { useAuthStore } from "@/store/auth-store";
 import LoginModal from "@/components/modals/LoginModal";
 import { showToast } from "@/utils/show-toast";
 import RegisterModal from "@/components/modals/RegisterModal";
+import { useMutation } from "@tanstack/react-query";
+import requestAPI from "@/utils/request-api";
+import { authApi, RegisterRequestPayload } from "@/lib/apis/auth";
 // import { useCartStore } from "@/store/cart-store";
 
 export function Navbar() {
@@ -27,15 +30,13 @@ export function Navbar() {
   const { user, isAuthenticated } = useAuthStore();
   // const { getTotalItems } = useCartStore();
   const [authMode, setAuthMode] = useState<"login" | "register">();
-  const [redirectTo, setRedirectTo] = useState("/");
 
   const handleLogout = () => {
     router.push("/");
   };
 
-  const openAuthModal = (mode: "login" | "register", redirect = "/") => {
+  const openAuthModal = (mode: "login" | "register") => {
     setAuthMode(mode);
-    // setRedirectTo(redirect);
   };
 
   return (
@@ -134,20 +135,11 @@ export function Navbar() {
       <LoginModal
         isOpen={authMode === "login"}
         onClose={() => setAuthMode(undefined)}
-        onLogin={async () => {}}
       />
       <RegisterModal
         isOpen={authMode === "register"}
         onClose={() => setAuthMode(undefined)}
-        onRegister={async () => {}}
       />
-
-      {/* <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-        initialMode={authMode}
-        redirectTo={redirectTo}
-      /> */}
     </>
   );
 }

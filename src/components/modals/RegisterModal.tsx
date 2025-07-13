@@ -1,4 +1,8 @@
+import { authApi, RegisterRequestPayload } from "@/lib/apis/auth";
+import requestAPI from "@/utils/request-api";
+import { showToast } from "@/utils/show-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
@@ -20,14 +24,12 @@ import {
 } from "../ui/select";
 import Modal from "./Modal";
 
+export type RegisterForm = z.infer<typeof registerSchema>;
+
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  onRegister: (data: RegisterForm) => Promise<void>;
-  isLoading?: boolean;
 };
-
-type RegisterForm = z.infer<typeof registerSchema>;
 
 const registerSchema = z
   .object({
@@ -42,12 +44,7 @@ const registerSchema = z
     path: ["confirmPassword"],
   });
 
-export default function RegisterModal({
-  isOpen,
-  onClose,
-  onRegister,
-  isLoading,
-}: Props) {
+export default function RegisterModal({ isOpen, onClose }: Props) {
   const registerForm = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -59,21 +56,49 @@ export default function RegisterModal({
     },
   });
 
+  const { mutate: registerUser, isPending: isRegisteringUser } = useMutation({
+    mutationFn: async (data: RegisterRequestPayload) => {
+      return await requestAPI(authApi.registerUser(data));
+    },
+    onSuccess() {
+      showToast(
+        "SUCCESS",
+        {
+          description: "User Registered successfully",
+        },
+        "success"
+      );
+      registerForm.reset();
+      onClose();
+    },
+  });
+
+  const handleRegisterUser = async (data: {
+    username: string;
+    role: "USER" | "ADMIN";
+    email: string;
+    password: string;
+    confirmPassword?: string;
+  }) => {
+    delete data.confirmPassword;
+    registerUser(data);
+  };
+
   return (
     <Modal
       open={isOpen}
       title="Create Account"
       description="Join ModernShop and start shopping today"
       onOpenChange={onClose}
-      isLoading={isLoading}
+      isLoading={isRegisteringUser}
       showCloseButton={false}
       showConfirmButton={false}
-      className="max-h-[90vh] overflow-y-auto scrollbar-hide self-center"
+      className="max-h-[90vh] overflow-y-auto scrollbar-hidden self-center"
     >
       <Form {...registerForm}>
         <form
           className="space-y-4"
-          onSubmit={registerForm.handleSubmit(onRegister)}
+          onSubmit={registerForm.handleSubmit(handleRegisterUser)}
         >
           <FormField
             control={registerForm.control}
@@ -86,7 +111,7 @@ export default function RegisterModal({
                     id="register-username"
                     {...field}
                     placeholder="Enter your username"
-                    disabled={isLoading}
+                    disabled={isRegisteringUser}
                   />
                 </FormControl>
                 <FormMessage />
@@ -131,7 +156,7 @@ export default function RegisterModal({
                     type="email"
                     {...field}
                     placeholder="Enter your email"
-                    disabled={isLoading}
+                    disabled={isRegisteringUser}
                   />
                 </FormControl>
                 <FormMessage />
@@ -150,7 +175,7 @@ export default function RegisterModal({
                     type="password"
                     {...field}
                     placeholder="Enter your password"
-                    disabled={isLoading}
+                    disabled={isRegisteringUser}
                   />
                 </FormControl>
                 <FormMessage />
@@ -169,7 +194,7 @@ export default function RegisterModal({
                     type="password"
                     {...field}
                     placeholder="Confirm your password"
-                    disabled={isLoading}
+                    disabled={isRegisteringUser}
                   />
                 </FormControl>
                 <FormMessage />
@@ -180,9 +205,9 @@ export default function RegisterModal({
           <Button
             type="submit"
             className="w-full bg-linear-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
-            disabled={isLoading}
+            disabled={isRegisteringUser}
           >
-            {isLoading ? (
+            {isRegisteringUser ? (
               <div className="flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                 Creating account...
@@ -198,7 +223,7 @@ export default function RegisterModal({
                 type="button"
                 onClick={() => {}}
                 className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
-                disabled={isLoading}
+                disabled={isRegisteringUser}
               >
                 Login here
               </button>

@@ -1,16 +1,23 @@
+import {
+  authApi,
+  LoginRequestPayload,
+  LoginResponsePayload,
+} from "@/lib/apis/auth";
+import requestAPI from "@/utils/request-api";
+import { showToast } from "@/utils/show-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import Modal from "./Modal";
-import { Button } from "../ui/button";
+import { useAuthStore } from "@/store/auth-store";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  onLogin: (data: LoginForm) => Promise<void>;
-  isLoading?: boolean;
 };
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -20,15 +27,44 @@ const loginSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-export default function LoginModal({
-  isOpen,
-  onClose,
-  onLogin,
-  isLoading,
-}: Props) {
+export default function LoginModal({ isOpen, onClose }: Props) {
+  const { setAuth } = useAuthStore();
+
   const loginForm = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
+
+  const { mutate: login, isPending: isLoggingIn } = useMutation({
+    mutationFn: async (
+      data: LoginRequestPayload
+    ): Promise<LoginResponsePayload> => {
+      return await requestAPI(authApi.loginUser(data));
+    },
+    onSuccess(data) {
+      setAuth({
+        isAuthenticated: !!data.accessToken,
+        token: data.accessToken,
+        user: data.user,
+      });
+      showToast(
+        "SUCCESS",
+        {
+          description: "Login Success",
+        },
+        "success"
+      );
+      loginForm.reset();
+      onClose();
+    },
+  });
+
+  const handleLogin = async (data: LoginForm) => {
+    login(data);
+  };
 
   return (
     <Modal
@@ -36,11 +72,14 @@ export default function LoginModal({
       title="Welcome Back"
       description="Enter your credentials to access your account"
       onOpenChange={onClose}
-      isLoading={isLoading}
+      isLoading={isLoggingIn}
       showCloseButton={false}
       showConfirmButton={false}
     >
-      <form className="space-y-4" onSubmit={loginForm.handleSubmit(onLogin)}>
+      <form
+        className="space-y-4"
+        onSubmit={loginForm.handleSubmit(handleLogin)}
+      >
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -48,7 +87,7 @@ export default function LoginModal({
             type="email"
             {...loginForm.register("email")}
             placeholder="Enter your email"
-            disabled={isLoading}
+            disabled={isLoggingIn}
           />
           {loginForm.formState.errors.email && (
             <p className="text-sm text-red-600">
@@ -63,7 +102,7 @@ export default function LoginModal({
             type="password"
             {...loginForm.register("password")}
             placeholder="Enter your password"
-            disabled={isLoading}
+            disabled={isLoggingIn}
           />
           {loginForm.formState.errors.password && (
             <p className="text-sm text-red-600">
@@ -74,9 +113,9 @@ export default function LoginModal({
         <Button
           type="submit"
           className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-          disabled={isLoading}
+          disabled={isLoggingIn}
         >
-          {isLoading ? (
+          {isLoggingIn ? (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
               Logging in...
@@ -107,7 +146,7 @@ export default function LoginModal({
               type="button"
               onClick={() => {}}
               className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
-              disabled={isLoading}
+              disabled={isLoggingIn}
             >
               Register here
             </button>

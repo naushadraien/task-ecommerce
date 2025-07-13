@@ -1,11 +1,10 @@
 import { AUTH_STORAGE } from "@/constants/local-storage";
-import { User } from "@/types/types";
-import { getItemFromLocalStorage } from "@/utils/local-storage";
+import { UserType } from "@/lib/apis/auth";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 type State = {
-  user: User | null;
+  user: UserType | null;
   token: string | null;
   isAuthenticated: boolean;
 };
@@ -14,7 +13,6 @@ type Action = {
   setAuth: (data: State) => void;
   logOut: VoidFunction;
   clearStorage: VoidFunction;
-  initializeAuth: (fallbackData?: State) => void;
 };
 
 export const useAuthStore = create<State & Action>()(
@@ -30,24 +28,6 @@ export const useAuthStore = create<State & Action>()(
           token: data.token,
           isAuthenticated: data.isAuthenticated,
         });
-      },
-      initializeAuth: (fallbackData?: State) => {
-        const authStorageData = getItemFromLocalStorage<State>(AUTH_STORAGE);
-        if (authStorageData) {
-          set({
-            user: authStorageData.user,
-            token: authStorageData.token,
-            isAuthenticated: authStorageData.isAuthenticated,
-          });
-        }
-
-        if (fallbackData) {
-          set({
-            user: fallbackData.user,
-            token: fallbackData.token,
-            isAuthenticated: fallbackData.isAuthenticated,
-          });
-        }
       },
 
       logOut: () => {
