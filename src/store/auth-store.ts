@@ -12,12 +12,11 @@ type State = {
 type Action = {
   setAuth: (data: State) => void;
   logOut: VoidFunction;
-  clearStorage: VoidFunction;
 };
 
 export const useAuthStore = create<State & Action>()(
   persist(
-    (set, get, api) => ({
+    (set) => ({
       user: null,
       token: null,
       isAuthenticated: false,
@@ -31,15 +30,6 @@ export const useAuthStore = create<State & Action>()(
       },
 
       logOut: () => {
-        set({
-          user: null,
-          token: null,
-          isAuthenticated: false,
-        });
-      },
-
-      clearStorage: () => {
-        api.persist.clearStorage();
         set({
           user: null,
           token: null,

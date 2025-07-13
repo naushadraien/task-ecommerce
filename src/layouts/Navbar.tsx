@@ -1,10 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { ShoppingCart, User, LogOut, Sun, Moon, Package } from "lucide-react";
-import { useTheme } from "next-themes";
+import LoginModal from "@/components/modals/LoginModal";
+import LogoutModal from "@/components/modals/LogoutModal";
+import RegisterModal from "@/components/modals/RegisterModal";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,31 +11,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-// import { AuthModal } from "@/components/auth-modal";
 import { useAuthStore } from "@/store/auth-store";
-import LoginModal from "@/components/modals/LoginModal";
-import { showToast } from "@/utils/show-toast";
-import RegisterModal from "@/components/modals/RegisterModal";
-import { useMutation } from "@tanstack/react-query";
-import requestAPI from "@/utils/request-api";
-import { authApi, RegisterRequestPayload } from "@/lib/apis/auth";
-// import { useCartStore } from "@/store/cart-store";
+import { LogOut, Moon, Package, Sun, User } from "lucide-react";
+import { useTheme } from "next-themes";
+import Link from "next/link";
+import { useState } from "react";
 
 export function Navbar() {
-  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { user, isAuthenticated } = useAuthStore();
-  // const { getTotalItems } = useCartStore();
-  const [authMode, setAuthMode] = useState<"login" | "register">();
+  const [authMode, setAuthMode] = useState<"login" | "register" | "logout">();
 
-  const handleLogout = () => {
-    router.push("/");
-  };
-
-  const openAuthModal = (mode: "login" | "register") => {
+  const openAuthModal = (mode: "login" | "register" | "logout") => {
     setAuthMode(mode);
   };
+
+  const handleAuthModalClose = () => setAuthMode(undefined);
 
   return (
     <>
@@ -108,7 +97,7 @@ export function Navbar() {
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
+                    <DropdownMenuItem onClick={() => openAuthModal("logout")}>
                       <LogOut className="mr-2 h-4 w-4" />
                       Logout
                     </DropdownMenuItem>
@@ -134,11 +123,15 @@ export function Navbar() {
 
       <LoginModal
         isOpen={authMode === "login"}
-        onClose={() => setAuthMode(undefined)}
+        onClose={handleAuthModalClose}
       />
       <RegisterModal
         isOpen={authMode === "register"}
-        onClose={() => setAuthMode(undefined)}
+        onClose={handleAuthModalClose}
+      />
+      <LogoutModal
+        isOpen={authMode === "logout"}
+        onClose={handleAuthModalClose}
       />
     </>
   );
