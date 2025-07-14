@@ -193,7 +193,7 @@ bun start
 
 ### 🚀 Live Demo
 The project is deployed and live on Vercel:
-**[ModernShop - Live Demo](https://your-vercel-deployment-url.vercel.app)**
+**[ModernShop - Live Demo](https://task-ecommerce-zeta.vercel.app/)**
 
 ### Deploy on Vercel
 This project is configured for seamless deployment on Vercel:
