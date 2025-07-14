@@ -281,4 +281,4 @@ For support, email support@modernshop.com or join our Slack channel.
 
 ---
 
-**Made with ❤️ by [Your Name]**
+**Made with ❤️ by MD. Naushad Raien**
