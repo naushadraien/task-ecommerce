@@ -1,12 +1,12 @@
-import Link from "next/link";
 import {
   Facebook,
-  Twitter,
   Instagram,
   Mail,
-  Phone,
   MapPin,
+  Phone,
+  Twitter,
 } from "lucide-react";
+import Link from "next/link";
 
 export function Footer() {
   return (
@@ -44,13 +44,13 @@ export function Footer() {
                 Shopping Cart
               </Link>
               <Link
-                href="/login"
+                href="#"
                 className="block text-sm text-muted-foreground hover:text-primary"
               >
                 Login
               </Link>
               <Link
-                href="/register"
+                href="#"
                 className="block text-sm text-muted-foreground hover:text-primary"
               >
                 Register
@@ -99,11 +99,11 @@ export function Footer() {
               </div>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4" />
-                <span>+1 (555) 123-4567</span>
+                <span>+977 (555) 123-4567</span>
               </div>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4" />
-                <span>123 Commerce St, City, State 12345</span>
+                <span>Kathmandu, Nepal</span>
               </div>
             </div>
           </div>
@@ -111,7 +111,7 @@ export function Footer() {
 
         <div className="border-t mt-8 pt-8 text-center">
           <p className="text-sm text-muted-foreground">
-            © 2024 ModernShop. All rights reserved. Built with Next.js and
+            © 2025 ModernShop. All rights reserved. Built with Next.js and
             Tailwind CSS.
           </p>
         </div>

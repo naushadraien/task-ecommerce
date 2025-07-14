@@ -16,12 +16,10 @@ import { useAuthStore } from "@/store/auth-store";
 import { useCartStore } from "@/store/cart-store";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Heart,
   LogOut,
   Menu,
   Moon,
   Package,
-  Search,
   ShoppingCart,
   Sun,
   User,
@@ -261,15 +259,6 @@ export function Navbar() {
                     Admin
                   </Link>
                 )}
-
-                <div className="flex space-x-2 pt-4">
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <Search className="h-5 w-5" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <Heart className="h-5 w-5" />
-                  </Button>
-                </div>
 
                 {!isAuthenticated && (
                   <div className="flex space-x-2 pt-4">
